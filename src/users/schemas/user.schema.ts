@@ -70,8 +70,7 @@ export class Register {
     @Prop()
     password: string;
 
-    @Prop({ type: mongoose.Schema.Types.Array, ref: () => "Task" })
-    tasks: string[];
+    
 
 
     @Prop()
