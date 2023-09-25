@@ -10,14 +10,36 @@ import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
+import { ConfigService, ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    UsersModule, RoomsModule, RatingsModule, FavoritesModule, BookingsModule, RolesModule, PermissionsModule, AuthModule,
-    //  MongooseModule.forRoot('mongodb+srv://truongminhduc:123456%40@cluster0.dcjbayh.mongodb.net/mduc'),
-  
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGO_URL'),
+        connectionFactory: (connection) => {
+          connection.plugin(softDeletePlugin);
+          return connection;
+        }
+
+      }),
+      inject: [ConfigService],
+    }),
+    UsersModule,
+    RoomsModule,
+    RatingsModule,
+    FavoritesModule,
+    BookingsModule,
+    RolesModule,
+    PermissionsModule,
+    AuthModule,
+
+
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

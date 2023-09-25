@@ -14,4 +14,19 @@ export class CreateUserDto {
     // role: string;
 }
 
+export class RegisterUserDto {
+
+    @IsNotEmpty({ message: 'name khong duoc de trong ' })
+    name: string;
+
+    @IsEmail({}, { message: 'email khong dung dinh dang ' })
+    @IsNotEmpty({ message: 'email khong de trong ' })
+    email: string;
+
+
+    @IsNotEmpty({ message: 'pass khong duoc de trong ' })
+    password: string;
+
+
+}
 
