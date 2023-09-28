@@ -9,6 +9,10 @@ export class CreateUserDto {
     @IsNotEmpty({ message: "password khong dc de trong " })
     password: string;
 
+    @IsNotEmpty({ message: "name khong dc de trong " })
+    name: string;
+
+
 
     // @IsNotEmpty({ message: "role khong dc de trong " })
     // role: string;
