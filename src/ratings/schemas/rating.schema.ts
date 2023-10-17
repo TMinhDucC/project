@@ -10,7 +10,7 @@ export class Rating {
 
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-    user: mongoose.Types.ObjectId
+    users: mongoose.Types.ObjectId
 
     @Prop()
     rating: number;

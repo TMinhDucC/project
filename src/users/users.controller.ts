@@ -1,16 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { IUser } from './user.interface';
+import { Public, User } from 'src/decorater/customize';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  // @Public()
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-
-    return await this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto, @User() user: IUser) {
+    return await this.usersService.create(createUserDto, user);
   }
 
   @Get()
@@ -27,12 +29,12 @@ export class UsersController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.usersService.update(id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @User() user: IUser) {
+    return await this.usersService.update(id, updateUserDto, user);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.usersService.remove(id);
+  async remove(@Param('id') id: string, @User() user: IUser) {
+    return await this.usersService.remove(id, user);
   }
 }
