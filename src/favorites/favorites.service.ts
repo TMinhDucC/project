@@ -5,16 +5,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Favorite, FavoriteDocument } from './schemas/favorite.schema';
 import aqp from 'api-query-params';
+import { IUser } from 'src/users/user.interface';
 
 @Injectable()
 export class FavoritesService {
   constructor(@InjectModel(Favorite.name) private FavoriteModel: SoftDeleteModel<FavoriteDocument>) { }
 
-  async create(createFavoriteDto: CreateFavoriteDto) {
-    const { room, user } = createFavoriteDto
+  async create(createFavoriteDto: CreateFavoriteDto, user: IUser) {
+    const { room, users } = createFavoriteDto
     return await this.FavoriteModel.create({
       room,
-      user
+      users,
+      createdBy: {
+        _id: user._id,
+        email: user.email
+      }
     })
   }
 
@@ -49,11 +54,31 @@ export class FavoritesService {
     return await this.FavoriteModel.findOne({ _id: id })
   }
 
-  async update(id: string, updateFavoriteDto: UpdateFavoriteDto) {
-    return await this.FavoriteModel.updateOne({ _id: id }, { ...updateFavoriteDto })
+  async update(id: string, updateFavoriteDto: UpdateFavoriteDto, user: IUser) {
+    return await this.FavoriteModel.updateOne(
+      { _id: id },
+      {
+        ...updateFavoriteDto,
+        updatedBy: {
+          _id: user._id,          
+          email: user.email
+        }
+
+      }
+
+    )
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: IUser) {
+    await this.FavoriteModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
     return await this.FavoriteModel.softDelete({ _id: id })
   }
 }

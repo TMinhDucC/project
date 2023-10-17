@@ -5,20 +5,25 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Room, RoomDocument } from './schemas/room.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
+import { IUser } from 'src/users/user.interface';
 
 @Injectable()
 export class RoomsService {
 
   constructor(@InjectModel(Room.name) private RoomModel: SoftDeleteModel<RoomDocument>) { }
 
-  async create(createRoomDto: CreateRoomDto) {
+  async create(createRoomDto: CreateRoomDto, user: IUser) {
     const { description, name, price, address, images } = createRoomDto
     return await this.RoomModel.create({
       description,
       name,
       price,
       address,
-      images
+      images,
+      createdBy: {
+        _id: user._id,
+        email: user.email
+      }
     })
   }
 
@@ -55,11 +60,28 @@ export class RoomsService {
     return await this.RoomModel.findOne({ _id: id })
   }
 
-  async update(id: string, updateRoomDto: UpdateRoomDto) {
-    return await this.RoomModel.updateOne({ _id: id }, { ...updateRoomDto })
+  async update(id: string, updateRoomDto: UpdateRoomDto, user: IUser) {
+    return await this.RoomModel.updateOne(
+      { _id: id },
+      {
+        ...updateRoomDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      })
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: IUser) {
+    await this.RoomModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
     return await this.RoomModel.softDelete({ _id: id })
   }
 }

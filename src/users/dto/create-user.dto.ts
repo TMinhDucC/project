@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsMongoId, IsNotEmpty } from 'class-validator';
 
 
 export class CreateUserDto {
@@ -14,8 +14,9 @@ export class CreateUserDto {
 
 
 
-    // @IsNotEmpty({ message: "role khong dc de trong " })
-    // role: string;
+    @IsNotEmpty({ message: "role khong dc de trong " })
+    @IsMongoId({message: "role la mongo id "})
+    role: string;
 }
 
 export class RegisterUserDto {

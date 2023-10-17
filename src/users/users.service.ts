@@ -4,21 +4,26 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
-import { genSaltSync, hashSync } from 'bcryptjs'
+import { genSaltSync, hashSync, compareSync } from 'bcryptjs'
 import aqp from 'api-query-params';
+import { IUser } from './user.interface';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) { }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, user: IUser) {
 
-    const { email, password, name } = createUserDto
+    const { email, password, name, role } = createUserDto
     const hashedPass = this.hashPassword(password)
     return this.userModel.create({
       email,
       password: hashedPass,
-      name
+      name, role,
+      createdBy: {
+        _id: user._id,
+        email: user.email
+      }
     })
   }
 
@@ -57,15 +62,31 @@ export class UsersService {
     return await this.userModel.findOne({ _id: id })
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto, user: IUser) {
     return await this.userModel.updateOne(
       { _id: id },
       {
-        ...updateUserDto
-      })
+        ...updateUserDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: IUser) {
+
+    await this.userModel.updateOne(
+      { _id: id },
+
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    )
     return await this.userModel.softDelete({ _id: id })
   }
 
@@ -74,4 +95,23 @@ export class UsersService {
     const hash = hashSync(password, salt);
     return hash
   }
+
+  findOneByUsername = async (username: string) => {
+
+    try {
+      return await this.userModel.findOne({ email: username })
+        .populate({ path: "role", select: { name: 1 } })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  checkPassword = (password: any, hash: any) => {
+    return compareSync(password, hash)
+  }
+
+  updateUserToken = async (refresh_token: any, _id: any) => {
+    await this.userModel.updateOne({ _id: _id }, { refreshToken: refresh_token })
+  }
+
 }

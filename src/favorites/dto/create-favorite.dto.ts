@@ -9,10 +9,10 @@ export class CreateFavoriteDto {
     @IsArray({ message: 'room phai la array' })
     room: mongoose.Schema.Types.ObjectId;
 
-    @IsNotEmpty({ message: 'user khong duoc de trong' })
+    @IsNotEmpty({ message: 'users khong duoc de trong' })
     @IsMongoId({ each: true, message: "each user la mongo id" })
 
-    user: mongoose.Schema.Types.ObjectId
+    users: mongoose.Schema.Types.ObjectId
 
 
 
