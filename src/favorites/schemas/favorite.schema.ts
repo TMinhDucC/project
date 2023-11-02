@@ -1,47 +1,45 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import mongoose, { Document } from 'mongoose'
 
-export type FavoriteDocument = Document & Favorite;
+export type FavoriteDocument = Document & Favorite
 
 @Schema({ timestamps: true })
 export class Favorite {
-    @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }])
-    room: mongoose.Types.ObjectId[];
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Room' }])
+  room: mongoose.Types.ObjectId[]
 
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  users: mongoose.Types.ObjectId
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-    users: mongoose.Types.ObjectId
+  @Prop({ type: Object })
+  createdBy: {
+    _id: mongoose.Types.ObjectId
+    email: string
+  }
 
+  @Prop()
+  createAt: string
 
-    @Prop({ type: Object })
-    createdBy: {
-        _id: mongoose.Types.ObjectId;
-        email: string;
-    };
+  @Prop()
+  isDelete: boolean
 
-    @Prop()
-    createAt: string;
+  @Prop()
+  deleteAt: string
 
-    @Prop()
-    isDelete: boolean;
+  @Prop({ type: Object })
+  deletedBy: {
+    _id: mongoose.Types.ObjectId
+    email: string
+  }
 
-    @Prop()
-    deleteAt: string;
+  @Prop()
+  updateAt: string
 
-    @Prop({ type: Object })
-    deletedBy: {
-        _id: mongoose.Types.ObjectId;
-        email: string;
-    };
-
-    @Prop()
-    updateAt: string;
-
-    @Prop({ type: Object })
-    updatedBy: {
-        _id: mongoose.Types.ObjectId;
-        email: string;
-    };
+  @Prop({ type: Object })
+  updatedBy: {
+    _id: mongoose.Types.ObjectId
+    email: string
+  }
 }
 
-export const FavoriteSchema = SchemaFactory.createForClass(Favorite);
+export const FavoriteSchema = SchemaFactory.createForClass(Favorite)
